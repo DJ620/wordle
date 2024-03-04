@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import getWord from "../utils/getWord";
 import "../index.css";
 import Guess from "../components/Guess";
+import Keyboard from "../components/Keyboard";
 
 function Home() {
   const [word, setWord] = useState("");
   const [inputLetter, setInputLetter] = useState("");
   const [guessNumber, setGuessNumber] = useState(1);
+  const [numGuesses, setNumGuesses] = useState(5);
 
   useEffect(() => {
     grabNewWord();
@@ -18,7 +20,7 @@ function Home() {
   };
 
   const grabNewWord = async () => {
-    const { data } = await getWord.newWord();
+    const { data } = await getWord.newWord(numGuesses);
     const letters = data[0].split("");
     console.log(letters);
     setWord(letters);
@@ -26,41 +28,21 @@ function Home() {
 
   return (
     <div>
-      <Guess
-        word={word}
-        inputLetter={guessNumber === 1 ? inputLetter : null}
-        setInputLetter={setInputLetter}
-        guessNumber={guessNumber}
-        setGuessNumber={setGuessNumber}
-      />
-      <Guess
-        word={word}
-        inputLetter={guessNumber === 2 ? inputLetter : null}
-        setInputLetter={setInputLetter}
-        guessNumber={guessNumber}
-        setGuessNumber={setGuessNumber}
-      />
-      <Guess
-        word={word}
-        inputLetter={guessNumber === 3 ? inputLetter : null}
-        setInputLetter={setInputLetter}
-        guessNumber={guessNumber}
-        setGuessNumber={setGuessNumber}
-      />
-      <Guess
-        word={word}
-        inputLetter={guessNumber === 4 ? inputLetter : null}
-        setInputLetter={setInputLetter}
-        guessNumber={guessNumber}
-        setGuessNumber={setGuessNumber}
-      />
-      <Guess
-        word={word}
-        inputLetter={guessNumber === 5 ? inputLetter : null}
-        setInputLetter={setInputLetter}
-        guessNumber={guessNumber}
-        setGuessNumber={setGuessNumber}
-      />
+      {[...Array(numGuesses).keys()].map((num) => {
+        return (
+          <Guess
+            key={num}
+            word={word}
+            inputLetter={guessNumber === num + 1 ? inputLetter : null}
+            setInputLetter={setInputLetter}
+            guessNumber={guessNumber}
+            setGuessNumber={setGuessNumber}
+            numLetters={numGuesses}
+            setNumLetters={setNumGuesses}
+          />
+        );
+      })}
+      <Keyboard />
     </div>
   );
 }

@@ -6,15 +6,20 @@ const Guess = ({
   inputLetter,
   setInputLetter,
   setGuessNumber,
+  numLetters,
+  setNumLetters,
 }) => {
   const [guess, setGuess] = useState([]);
-  const [numLetters, setNumLetters] = useState(5);
+
+  useEffect(() => {
+    setGuess([]);
+  }, [word]);
 
   useEffect(() => {
     if (
       inputLetter?.length === 1 &&
       /[a-zA-Z]/.test(inputLetter) &&
-      guess.length < 5
+      guess.length < numLetters
     ) {
       setGuess([
         ...guess,
@@ -28,7 +33,7 @@ const Guess = ({
     if (inputLetter === "Backspace") {
       setGuess(guess.slice(0, -1));
     }
-    if (inputLetter === "Enter" && guess.length === 5) {
+    if (inputLetter === "Enter" && guess.length === numLetters) {
       handleGuess();
     }
     setInputLetter("");
@@ -65,7 +70,11 @@ const Guess = ({
     });
     console.log({ currentGuess });
     setGuess(currentGuess);
-    setGuessNumber(previous => previous + 1);
+    setGuessNumber((previous) => {
+        if (previous < numLetters) {
+            return previous + 1;
+        };
+    });
   };
 
   return (
