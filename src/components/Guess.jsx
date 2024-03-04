@@ -1,43 +1,51 @@
 import { useState, useEffect } from "react";
 import Letter from "./Letter";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addGuessedLetters } from "../store/slices/letterSlice";
+import { reduxSolved } from "../store/slices/solvedSlice";
+import { reduxfailed } from "../store/slices/failedSlice";
 
 const Guess = ({
   word,
   inputLetter,
   setInputLetter,
+  guessNumber,
   setGuessNumber,
   numLetters,
-  setNumLetters,
 }) => {
   const dispatch = useDispatch();
+  const solved = useSelector((state) => state.solved);
+  const failed = useSelector((state) => state.failed);
   const [guess, setGuess] = useState([]);
 
   useEffect(() => {
-    setGuess([]);
-  }, [word]);
+    if (!solved && !failed) {
+      setGuess([]);
+    }
+  }, [solved, failed]);
 
   useEffect(() => {
-    if (
-      inputLetter?.length === 1 &&
-      /[a-zA-Z]/.test(inputLetter) &&
-      guess.length < numLetters
-    ) {
-      setGuess([
-        ...guess,
-        {
-          letter: inputLetter.toLowerCase(),
-          index: guess.length,
-          result: "pending",
-        },
-      ]);
-    }
-    if (inputLetter === "Backspace") {
-      setGuess(guess.slice(0, -1));
-    }
-    if (inputLetter === "Enter" && guess.length === numLetters) {
-      handleGuess();
+    if (!solved) {
+      if (
+        inputLetter?.length === 1 &&
+        /[a-zA-Z]/.test(inputLetter) &&
+        guess.length < numLetters
+      ) {
+        setGuess([
+          ...guess,
+          {
+            letter: inputLetter.toLowerCase(),
+            index: guess.length,
+            result: "pending",
+          },
+        ]);
+      }
+      if (inputLetter === "Backspace") {
+        setGuess(guess.slice(0, -1));
+      }
+      if (inputLetter === "Enter" && guess.length === numLetters) {
+        handleGuess();
+      }
     }
     setInputLetter("");
   }, [inputLetter]);
@@ -74,6 +82,18 @@ const Guess = ({
     console.log({ currentGuess });
     setGuess(currentGuess);
     dispatch(addGuessedLetters(currentGuess));
+    const isSolved = Object.keys(
+      Object.groupBy(currentGuess, ({ result }) => result)
+    );
+    if (isSolved.length === 1 && isSolved[0] === "match") {
+      dispatch(reduxSolved(true));
+    }
+    if (
+      numLetters === guessNumber &&
+      (isSolved.length > 1 || isSolved[0] !== "match")
+    ) {
+      dispatch(reduxfailed(true));
+    }
     setGuessNumber((previous) => {
       if (previous < numLetters) {
         return previous + 1;

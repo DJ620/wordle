@@ -4,16 +4,22 @@ import { useSelector } from "react-redux";
 
 const KeyboardLetter = ({ letter, handleLetterPress }) => {
   const guessedLetters = useSelector((state) => state.guessedLetters);
+  const solved = useSelector(state => state.solved);
+  const failed = useSelector(state => state.failed);
 
   const [status, setStatus] = useState("pending");
+
+  useEffect(() => {
+    if (!solved && !failed) {
+      setStatus("pending");
+    }
+  }, [solved, failed]);
 
   useEffect(() => {
     if (status === "pending" || status === "partial") {
         const groupedLetters = Object.groupBy(guessedLetters, ({letter}) => letter);
     if (Object.keys(groupedLetters).includes(letter)) {
-        console.log(groupedLetters[letter]);
         const groupedResults = Object.groupBy(groupedLetters[letter], ({result}) => result);
-        console.log({groupedResults});
         if (Object.keys(groupedResults).includes("match")) {
             setStatus("match");
         } else if (Object.keys(groupedResults).includes("partial")) {
