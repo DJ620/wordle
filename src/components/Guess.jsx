@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import Letter from "./Letter";
+import { useDispatch } from "react-redux";
+import { addGuessedLetters } from "../store/slices/letterSlice";
 
 const Guess = ({
   word,
@@ -9,6 +11,7 @@ const Guess = ({
   numLetters,
   setNumLetters,
 }) => {
+  const dispatch = useDispatch();
   const [guess, setGuess] = useState([]);
 
   useEffect(() => {
@@ -70,15 +73,16 @@ const Guess = ({
     });
     console.log({ currentGuess });
     setGuess(currentGuess);
+    dispatch(addGuessedLetters(currentGuess));
     setGuessNumber((previous) => {
-        if (previous < numLetters) {
-            return previous + 1;
-        };
+      if (previous < numLetters) {
+        return previous + 1;
+      }
     });
   };
 
   return (
-    <div style={{ display: "flex", gap: "15px" }}>
+    <div style={{ display: "flex", gap: "15px", justifyContent: "center" }}>
       {[...Array(numLetters).keys()].map((num) => {
         return <Letter key={num} letter={guess[num] || ""} />;
       })}

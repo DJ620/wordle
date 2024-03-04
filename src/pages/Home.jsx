@@ -19,6 +19,10 @@ function Home() {
     setInputLetter(e.key);
   };
 
+  const handleLetterPress = (letter) => {
+    setInputLetter(letter);
+  };
+
   const grabNewWord = async () => {
     const { data } = await getWord.newWord(numGuesses);
     const letters = data[0].split("");
@@ -42,7 +46,7 @@ function Home() {
           />
         );
       })}
-      <Keyboard />
+      <Keyboard handleLetterPress={handleLetterPress}/>
     </div>
   );
 }

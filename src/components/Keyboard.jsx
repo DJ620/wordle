@@ -1,10 +1,10 @@
 import React from "react";
 import KeyboardLetter from "./KeyboardLetter";
 
-const Keyboard = () => {
-  const topRow = "QWERTYUIOP".split("");
-  const middleRow = "ASDFGHJKL".split("");
-  const bottomRow = "ZXCVBNM".split("");
+const Keyboard = ({handleLetterPress}) => {
+  const topRow = "qwertyuiop".split("");
+  const middleRow = "asdfghjkl".split("");
+  const bottomRow = "zxcvbnm".split("");
   return (
     <div>
       <div
@@ -16,7 +16,7 @@ const Keyboard = () => {
         }}
       >
         {topRow.map((letter) => {
-          return <KeyboardLetter key={letter} letter={letter} />;
+          return <KeyboardLetter key={letter} letter={letter} handleLetterPress={handleLetterPress} />;
         })}
       </div>
 
@@ -29,14 +29,16 @@ const Keyboard = () => {
         }}
       >
         {middleRow.map((letter) => {
-          return <KeyboardLetter key={letter} letter={letter} />;
+          return <KeyboardLetter key={letter} letter={letter} handleLetterPress={handleLetterPress} />;
         })}
       </div>
 
       <div style={{ display: "flex", gap: "5px", justifyContent: "center" }}>
+        <KeyboardLetter letter={"Enter"} handleLetterPress={handleLetterPress} />
         {bottomRow.map((letter) => {
-          return <KeyboardLetter key={letter} letter={letter} />;
+          return <KeyboardLetter key={letter} letter={letter} handleLetterPress={handleLetterPress} />;
         })}
+        <KeyboardLetter letter={"Backspace"} handleLetterPress={handleLetterPress} />
       </div>
     </div>
   );
