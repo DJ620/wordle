@@ -8,6 +8,7 @@ const Guess = ({
   setGuessNumber,
 }) => {
   const [guess, setGuess] = useState([]);
+  const [numLetters, setNumLetters] = useState(5);
 
   useEffect(() => {
     if (
@@ -69,8 +70,8 @@ const Guess = ({
 
   return (
     <div style={{ display: "flex", gap: "15px" }}>
-      {guess.map((letter, index) => {
-        return <Letter key={index} letter={letter} />;
+      {[...Array(numLetters).keys()].map((num) => {
+        return <Letter key={num} letter={guess[num] || ""} />;
       })}
     </div>
   );

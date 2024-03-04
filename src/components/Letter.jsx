@@ -19,7 +19,7 @@ const Letter = ({letter}) => {
             : "",
       }}
     >
-      <p style={{ margin: "0px" }}>{letter.letter.toUpperCase()}</p>
+      <p style={{ margin: "0px" }}>{letter?.letter?.toUpperCase()}</p>
     </div>
   );
 };
