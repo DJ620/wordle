@@ -51,13 +51,11 @@ const Guess = ({
   }, [inputLetter]);
 
   const handleGuess = () => {
-    console.log(guess);
     let currentGuess = guess.map((letter) => ({ ...letter }));
     let letterCount = {};
     word.forEach((letter) => {
       letterCount[letter] = letterCount[letter] + 1 || 1;
     });
-    console.log({ letterCount });
     currentGuess.map((letter) => {
       if (letter.letter === word[letter.index]) {
         letter.result = "match";
@@ -79,32 +77,41 @@ const Guess = ({
         }
       }
     });
-    console.log({ currentGuess });
-    setGuess(currentGuess);
-    dispatch(addGuessedLetters(currentGuess));
-    const isSolved = Object.keys(
-      Object.groupBy(currentGuess, ({ result }) => result)
-    );
-    if (isSolved.length === 1 && isSolved[0] === "match") {
-      dispatch(reduxSolved(true));
-    }
-    if (
-      numLetters === guessNumber &&
-      (isSolved.length > 1 || isSolved[0] !== "match")
-    ) {
-      dispatch(reduxfailed(true));
-    }
-    setGuessNumber((previous) => {
-      if (previous < numLetters) {
-        return previous + 1;
+    revealLetters(currentGuess);
+  };
+
+  const revealLetters = (currentGuess, originalGuess = guess, index = 0) => {
+    setTimeout(() => {
+      const updatedGuess = originalGuess.map((letter) => ({ ...letter }));
+      updatedGuess.splice(index, 1, currentGuess[index]);
+      setGuess(updatedGuess); 
+      if (index < currentGuess.length - 1) {
+        revealLetters(currentGuess, updatedGuess, index + 1);
+      } else {
+        dispatch(addGuessedLetters(currentGuess));
+        const isSolved = Object.keys(
+          Object.groupBy(currentGuess, ({ result }) => result)
+        );
+        if (isSolved.length === 1 && isSolved[0] === "match") {
+          dispatch(reduxSolved(true));
+        }
+        if (
+          numLetters === guessNumber &&
+          (isSolved.length > 1 || isSolved[0] !== "match")
+        ) {
+          dispatch(reduxfailed(true));
+        }
+        setGuessNumber((previous) => {
+          if (previous < numLetters) {
+            return previous + 1;
+          }
+        });
       }
-    });
+    }, 250);
   };
 
   return (
-    <div 
-    className="flex gap-2 justify-center"
-    >
+    <div className="flex gap-2 justify-center">
       {[...Array(numLetters).keys()].map((num) => {
         return <Letter key={num} letter={guess[num] || ""} />;
       })}

@@ -1,6 +1,17 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 const Letter = ({ letter }) => {
+  const [animate, setAnimate] = useState(false);
+
+  useEffect(() => {
+    if (letter.result && letter.result !== "pending") {
+      setAnimate(true);
+    } else {
+      setAnimate(false);
+    };
+  }, [letter.result]);
+
   const getBackgroundColor = () => {
     switch (letter.result) {
       case "match":
@@ -15,13 +26,20 @@ const Letter = ({ letter }) => {
   };
 
   return (
-    <div
+    <motion.div
       className={`w-12 h-12 mb-2 border-2 border-gray-500 ${getBackgroundColor()} flex justify-center items-center`}
+      animate={
+        animate ? { rotateX: 180 } : {}
+      }
+      transition={{ duration: 0.25 }}
+      onAnimationComplete={() => setAnimate(false)}
     >
       <div className="w-full h-full flex justify-center items-center">
-        <p className="m-0 uppercase font-extrabold">{letter?.letter?.toUpperCase()}</p>
+        <p className="m-0 uppercase font-extrabold">
+          {letter?.letter?.toUpperCase()}
+        </p>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
