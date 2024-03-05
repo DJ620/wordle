@@ -35,20 +35,19 @@ const KeyboardLetter = ({ letter, handleLetterPress }) => {
     <div
       onClick={() => handleLetterPress(letter)}
       key={letter}
-      style={{
-        borderRadius: "2px",
-        padding: "5px",
-        width: letter.length > 1 ? "40px" : "15px",
-        height: "20px",
-        textAlign: "center",
-        cursor: "pointer",
-        background: status === "match" ? "green" : status === "partial" ? "goldenrod" : status === "wrong" ? "red" : "gray",
-      }}
+      className={`rounded-md px-2 py-1 ${letter.length > 1 ? "w-16" : "w-8"} h-8 text-center cursor-pointer flex justify-center ${
+        status === "match" ? "bg-green-600" :
+        status === "partial" ? "bg-yellow-500" :
+        status === "wrong" ? "bg-gray-700" :
+        "bg-gray-500"
+      }`}
     >
       {letter === "Backspace" ? (
-        <FiDelete style={{ marginTop: "2px" }} />
+        <FiDelete className="mt-1" />
       ) : (
-        <p style={{ margin: "0", fontSize: letter === "Enter" && "12px", marginTop: letter === "Enter" ? "2px" : "0px" }}>{letter.toUpperCase()}</p>
+        <p className={`${letter === "Enter" ? "text-xs mt-1" : ""}`}>
+          {letter.toUpperCase()}
+        </p>
       )}
     </div>
   );

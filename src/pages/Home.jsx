@@ -11,7 +11,7 @@ import { reduxfailed } from "../store/slices/failedSlice";
 function Home() {
   const dispatch = useDispatch();
   const solved = useSelector((state) => state.solved);
-  const failed = useSelector(state => state.failed);
+  const failed = useSelector((state) => state.failed);
   const [word, setWord] = useState("");
   const [inputLetter, setInputLetter] = useState("");
   const [guessNumber, setGuessNumber] = useState(1);
@@ -51,14 +51,17 @@ function Home() {
     setGuessNumber(1);
     dispatch(reduxfailed(false));
     if (numGuesses > 3) {
-        setNumGuesses(3);
+      setNumGuesses(3);
     } else {
-        grabNewWord();
-    };
+      grabNewWord();
+    }
   };
 
   return (
-    <div>
+    <div className="container mx-auto p-4">
+      <p className="text-xl font-semibold text-center mb-5">
+        Level {numGuesses - 2}
+      </p>
       {[...Array(numGuesses).keys()].map((num) => {
         return (
           <Guess
@@ -73,16 +76,28 @@ function Home() {
         );
       })}
       <Keyboard handleLetterPress={handleLetterPress} />
+
       {solved && (
-        <div>
-          <p>Great job!</p>
-          <button onClick={handleNextLevel}>Next Level</button>
+        <div className="mt-4 text-center">
+          <p className="text-xl text-green-500 mb-2 font-semibold">Great job!</p>
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleNextLevel}>
+            Next Level
+          </button>
         </div>
       )}
+
       {failed && (
-        <div>
-          <p>Better luck next time!</p>
-          <button onClick={handleTryAgain}>Try Again</button>
+        <div className="mt-4 text-center">
+          <p className="text-xl text-red-500 font-semibold">
+            Game Over
+          </p>
+          <p >{numGuesses === 3 && `You reached level ${numGuesses - 2}!`}</p>
+          <button
+            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2"
+            onClick={handleTryAgain}
+          >
+            Try Again
+          </button>
         </div>
       )}
     </div>

@@ -102,7 +102,9 @@ const Guess = ({
   };
 
   return (
-    <div style={{ display: "flex", gap: "15px", justifyContent: "center" }}>
+    <div 
+    className="flex gap-2 justify-center"
+    >
       {[...Array(numLetters).keys()].map((num) => {
         return <Letter key={num} letter={guess[num] || ""} />;
       })}
