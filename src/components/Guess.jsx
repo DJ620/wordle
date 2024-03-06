@@ -62,8 +62,6 @@ const Guess = ({
   const handleGuess = () => {
     let currentGuess = guess.map((letter) => ({ ...letter }));
     const guessWord = currentGuess.map((letter) => letter.letter).join("");
-    console.log(guessWord);
-    console.log(words.includes(guessWord));
     if (!words.includes(guessWord)) {
       return setIncorrectWord(true);
     };
@@ -138,8 +136,8 @@ const Guess = ({
       transition={{ duration: 0.3 }}
     >
       <div className="flex gap-2 justify-center">
-        {[...Array(numLetters).keys()].map((num) => {
-          return <Letter key={num} letter={guess[num] || ""} />;
+        {[...Array(numLetters).keys()].map((num, i) => {
+          return <Letter key={num} index={index} numLetters={numLetters} letterNum={i + 1} guessNumber={guessNumber} letter={guess[num] || ""} />;
         })}
       </div>
     </motion.div>

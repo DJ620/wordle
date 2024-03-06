@@ -76,6 +76,7 @@ function Home() {
   const handleTryAgain = () => {
     setGuessNumber(1);
     dispatch(reduxfailed(false));
+    setGuessedWords([]);
     if (numGuesses > 3) {
       setNumGuesses(3);
     } else {
@@ -84,7 +85,7 @@ function Home() {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto mt-5 p-4 relative">
       <p className="text-xl font-semibold text-center mb-5">
         Level {numGuesses - 2}
       </p>
@@ -127,7 +128,7 @@ function Home() {
       {failed && (
         <div className="mt-4 text-center">
           <p className="text-xl text-red-500 font-semibold">Game Over</p>
-          <p>{numGuesses > 3 && `You reached level ${numGuesses - 2}!`}</p>
+          <p>{numGuesses > 5 && `You reached level ${numGuesses - 2}!`}</p>
           <button
             className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2"
             onClick={handleTryAgain}
