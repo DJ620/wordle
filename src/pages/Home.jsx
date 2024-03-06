@@ -63,7 +63,7 @@ function Home() {
     const possibleWords = words.filter((word) => word.length === numGuesses);
     const currentWord =
       possibleWords[Math.floor(Math.random() * possibleWords.length)].split("");
-    console.log(currentWord);
+    // console.log(currentWord); //comment back in for testing
     setWord(currentWord);
   };
 
