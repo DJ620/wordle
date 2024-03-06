@@ -4,14 +4,23 @@ import { useDispatch, useSelector } from "react-redux";
 import { addGuessedLetters } from "../store/slices/letterSlice";
 import { reduxSolved } from "../store/slices/solvedSlice";
 import { reduxfailed } from "../store/slices/failedSlice";
+import words from "an-array-of-english-words";
+import { motion } from "framer-motion";
 
 const Guess = ({
+  index,
   word,
   inputLetter,
   setInputLetter,
   guessNumber,
   setGuessNumber,
   numLetters,
+  incorrectWord,
+  setIncorrectWord,
+  guessedWords,
+  setGuessedWords,
+  alreadyGuessed,
+  setAlreadyGuessed
 }) => {
   const dispatch = useDispatch();
   const solved = useSelector((state) => state.solved);
@@ -52,6 +61,16 @@ const Guess = ({
 
   const handleGuess = () => {
     let currentGuess = guess.map((letter) => ({ ...letter }));
+    const guessWord = currentGuess.map((letter) => letter.letter).join("");
+    console.log(guessWord);
+    console.log(words.includes(guessWord));
+    if (!words.includes(guessWord)) {
+      return setIncorrectWord(true);
+    };
+    if (guessedWords.includes(guessWord)) {
+      return setAlreadyGuessed(true);
+    };
+    setGuessedWords(previous => [...previous, guessWord]);
     let letterCount = {};
     word.forEach((letter) => {
       letterCount[letter] = letterCount[letter] + 1 || 1;
@@ -84,7 +103,7 @@ const Guess = ({
     setTimeout(() => {
       const updatedGuess = originalGuess.map((letter) => ({ ...letter }));
       updatedGuess.splice(index, 1, currentGuess[index]);
-      setGuess(updatedGuess); 
+      setGuess(updatedGuess);
       if (index < currentGuess.length - 1) {
         revealLetters(currentGuess, updatedGuess, index + 1);
       } else {
@@ -111,11 +130,19 @@ const Guess = ({
   };
 
   return (
-    <div className="flex gap-2 justify-center">
-      {[...Array(numLetters).keys()].map((num) => {
-        return <Letter key={num} letter={guess[num] || ""} />;
-      })}
-    </div>
+    <motion.div
+      initial={{ x: 0 }}
+      animate={{
+        x: (incorrectWord || alreadyGuessed) && index === guessNumber - 1 ? [-10, 10, -10, 10, 0] : 0
+      }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="flex gap-2 justify-center">
+        {[...Array(numLetters).keys()].map((num) => {
+          return <Letter key={num} letter={guess[num] || ""} />;
+        })}
+      </div>
+    </motion.div>
   );
 };
 
