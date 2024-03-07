@@ -13,7 +13,7 @@ const LandingPage = () => {
     dispatch(setVersion("classic"));
     dispatch(setNumberOfGuesses(6));
     dispatch(setNumberOfLetters(5));
-    navigate("/wordle/classic");
+    navigate("/classic");
   };
 
   return (
