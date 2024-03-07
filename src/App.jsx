@@ -7,10 +7,10 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-       <Route path="/" element={<Landing />} />
-       <Route path="/classic" element={<Home />} />
-       <Route path="/endless" element={<Home />} />
-       <Route path="custom/:encodedWord/:customNumGuesses" element={<Home />} />
+       <Route path="/wordle" element={<Landing />} />
+       <Route path="/wordle/classic" element={<Home />} />
+       <Route path="/wordle/endless" element={<Home />} />
+       <Route path="/wordle/custom/:encodedWord/:customNumGuesses" element={<Home />} />
       </Routes>
     </BrowserRouter>
   );
