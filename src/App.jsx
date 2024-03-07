@@ -1,10 +1,19 @@
-import React from 'react';
-import Home from './pages/Home';
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Landing from "./pages/Landing";
+import Home from "./pages/Home";
 
 const App = () => {
   return (
-    <Home />
-  )
+    <BrowserRouter>
+      <Routes>
+       <Route path="/" element={<Landing />} />
+       <Route path="/clasic" element={<Home />} />
+       <Route path="/endless" element={<Home />} />
+       <Route path="custom/:encodedWord" element={<Home />} />
+      </Routes>
+    </BrowserRouter>
+  );
 };
 
 export default App;

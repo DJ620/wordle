@@ -9,8 +9,10 @@ import { reduxSolved } from "../store/slices/solvedSlice";
 import { reduxfailed } from "../store/slices/failedSlice";
 import words from "an-array-of-english-words";
 import Popup from "../components/Popup";
+import { useParams } from "react-router-dom";
 
 function Home() {
+  const params = useParams();
   const dispatch = useDispatch();
   const solved = useSelector((state) => state.solved);
   const failed = useSelector((state) => state.failed);
@@ -24,25 +26,37 @@ function Home() {
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyPress, true);
+    if (params.encodedWord) {
+        console.log(atob(params.encodedWord))
+    }
+    let longestWord = words.sort((a,b) => b.length - a.length);
+    longestWord = longestWord.filter(word => word.length === longestWord[0].length - 1);
+    console.log({longestWord});
   }, []);
 
   useEffect(() => {
-    grabNewWord();
+    if (params.encodedWord) {
+        const customWord = atob(params.encodedWord);
+        setWord(customWord.split(""));
+        setNumGuesses(customWord.length);
+    } else {
+        grabNewWord();
+    }
   }, [numGuesses]);
 
   useEffect(() => {
     if (incorrectWord) {
-        setTimeout(() => {
-            setIncorrectWord(false);
-        }, 1000);
+      setTimeout(() => {
+        setIncorrectWord(false);
+      }, 1000);
     }
   }, [incorrectWord]);
 
   useEffect(() => {
     if (alreadyGuessed) {
-        setTimeout(() => {
-            setAlreadyGuessed(false);
-        }, 1000);
+      setTimeout(() => {
+        setAlreadyGuessed(false);
+      }, 1000);
     }
   }, [alreadyGuessed]);
 
@@ -63,7 +77,7 @@ function Home() {
     const possibleWords = words.filter((word) => word.length === numGuesses);
     const currentWord =
       possibleWords[Math.floor(Math.random() * possibleWords.length)].split("");
-    // console.log(currentWord); //comment back in for testing
+    console.log(currentWord); //comment back in for testing
     setWord(currentWord);
   };
 
@@ -135,17 +149,13 @@ function Home() {
           >
             Try Again
           </button>
-        <Popup message={word?.join("")} />
+          <Popup message={word?.join("")} />
         </div>
       )}
 
-      {incorrectWord && (
-        <Popup message="Not in word list" />
-      )}
+      {incorrectWord && <Popup message="Not in word list" />}
 
-{alreadyGuessed && (
-        <Popup message="Word already guessed" />
-      )}
+      {alreadyGuessed && <Popup message="Word already guessed" />}
     </div>
   );
 }
