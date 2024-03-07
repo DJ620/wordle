@@ -14,15 +14,15 @@ const Guess = ({
   setInputLetter,
   guessNumber,
   setGuessNumber,
-  numLetters,
   incorrectWord,
   setIncorrectWord,
   guessedWords,
   setGuessedWords,
   alreadyGuessed,
-  setAlreadyGuessed
+  setAlreadyGuessed,
 }) => {
   const dispatch = useDispatch();
+  const { numberOfLetters, numberOfGuesses } = useSelector(state => state.guessConfig);
   const solved = useSelector((state) => state.solved);
   const failed = useSelector((state) => state.failed);
   const [guess, setGuess] = useState([]);
@@ -38,7 +38,7 @@ const Guess = ({
       if (
         inputLetter?.length === 1 &&
         /[a-zA-Z]/.test(inputLetter) &&
-        guess.length < numLetters
+        guess.length < numberOfLetters
       ) {
         setGuess([
           ...guess,
@@ -52,7 +52,7 @@ const Guess = ({
       if (inputLetter === "Backspace") {
         setGuess(guess.slice(0, -1));
       }
-      if (inputLetter === "Enter" && guess.length === numLetters) {
+      if (inputLetter === "Enter" && guess.length === numberOfLetters) {
         handleGuess();
       }
     }
@@ -64,11 +64,11 @@ const Guess = ({
     const guessWord = currentGuess.map((letter) => letter.letter).join("");
     if (!words.includes(guessWord)) {
       return setIncorrectWord(true);
-    };
+    }
     if (guessedWords.includes(guessWord)) {
       return setAlreadyGuessed(true);
-    };
-    setGuessedWords(previous => [...previous, guessWord]);
+    }
+    setGuessedWords((previous) => [...previous, guessWord]);
     let letterCount = {};
     word.forEach((letter) => {
       letterCount[letter] = letterCount[letter] + 1 || 1;
@@ -113,13 +113,13 @@ const Guess = ({
           dispatch(reduxSolved(true));
         }
         if (
-          numLetters === guessNumber &&
+          numberOfGuesses === guessNumber &&
           (isSolved.length > 1 || isSolved[0] !== "match")
         ) {
           dispatch(reduxfailed(true));
         }
         setGuessNumber((previous) => {
-          if (previous < numLetters) {
+          if (previous < numberOfGuesses) {
             return previous + 1;
           }
         });
@@ -131,13 +131,24 @@ const Guess = ({
     <motion.div
       initial={{ x: 0 }}
       animate={{
-        x: (incorrectWord || alreadyGuessed) && index === guessNumber - 1 ? [-10, 10, -10, 10, 0] : 0
+        x:
+          (incorrectWord || alreadyGuessed) && index === guessNumber - 1
+            ? [-10, 10, -10, 10, 0]
+            : 0,
       }}
       transition={{ duration: 0.3 }}
     >
       <div className="flex gap-2 justify-center">
-        {[...Array(numLetters).keys()].map((num, i) => {
-          return <Letter key={num} index={index} numLetters={numLetters} letterNum={i + 1} guessNumber={guessNumber} letter={guess[num] || ""} />;
+        {[...Array(numberOfLetters).keys()].map((num, i) => {
+          return (
+            <Letter
+              key={num}
+              index={index}
+              letterNum={i + 1}
+              guessNumber={guessNumber}
+              letter={guess[num] || ""}
+            />
+          );
         })}
       </div>
     </motion.div>

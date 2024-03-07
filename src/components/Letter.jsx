@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
 
-const Letter = ({ letter, index, numLetters, letterNum, guessNumber }) => {
+const Letter = ({ letter, index, letterNum, guessNumber }) => {
+  const { numberOfLetters } = useSelector(state => state.guessConfig);
   const solved = useSelector((state) => state.solved);
   const [animate, setAnimate] = useState(false);
   const [animateSolve, setAnimateSolve] = useState(false);
@@ -19,7 +20,7 @@ const Letter = ({ letter, index, numLetters, letterNum, guessNumber }) => {
     if (solved && index === guessNumber - 1) {
       setTimeout(() => {
         animateElement();
-      }, numLetters * 250);
+      }, numberOfLetters * 250);
     }
   }, [solved]);
 

@@ -5,44 +5,55 @@ import Guess from "../components/Guess";
 import Keyboard from "../components/Keyboard";
 import { useDispatch, useSelector } from "react-redux";
 import { addWord } from "../store/slices/wordSlice";
+import {
+  setNumberOfGuesses,
+  setNumberOfLetters,
+} from "../store/slices/guessConfigSlice";
 import { reduxSolved } from "../store/slices/solvedSlice";
 import { reduxfailed } from "../store/slices/failedSlice";
 import words from "an-array-of-english-words";
 import Popup from "../components/Popup";
 import { useParams } from "react-router-dom";
+import todaysWord from "../assets/classicWords";
+import Title from "../components/Title";
 
 function Home() {
   const params = useParams();
   const dispatch = useDispatch();
+  const { numberOfGuesses, numberOfLetters } = useSelector(
+    (state) => state.guessConfig
+  );
+  const version = useSelector((state) => state.version);
   const solved = useSelector((state) => state.solved);
   const failed = useSelector((state) => state.failed);
   const [word, setWord] = useState("");
   const [guessedWords, setGuessedWords] = useState([]);
   const [inputLetter, setInputLetter] = useState("");
   const [guessNumber, setGuessNumber] = useState(1);
-  const [numGuesses, setNumGuesses] = useState(3);
   const [incorrectWord, setIncorrectWord] = useState(false);
   const [alreadyGuessed, setAlreadyGuessed] = useState(false);
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyPress, true);
     if (params.encodedWord) {
-        console.log(atob(params.encodedWord))
+      console.log(atob(params.encodedWord));
     }
-    let longestWord = words.sort((a,b) => b.length - a.length);
-    longestWord = longestWord.filter(word => word.length === longestWord[0].length - 1);
-    console.log({longestWord});
+    if (version === "classic") {
+      setWord(todaysWord.split(""));
+    }
+    if (version === "custom") {
+      const customWord = atob(params.encodedWord);
+      setWord(customWord.split(""));
+      dispatch(setNumberOfLetters(customWord.length));
+      dispatch(setNumberOfGuesses(params.customNumGuesses));
+    }
   }, []);
 
   useEffect(() => {
-    if (params.encodedWord) {
-        const customWord = atob(params.encodedWord);
-        setWord(customWord.split(""));
-        setNumGuesses(customWord.length);
-    } else {
-        grabNewWord();
+    if (version === "endless") {
+      grabNewWord();
     }
-  }, [numGuesses]);
+  }, [numberOfGuesses]);
 
   useEffect(() => {
     if (incorrectWord) {
@@ -74,16 +85,20 @@ function Home() {
     // console.log(letters);
     // setWord(letters);
     // dispatch(addWord(data));
-    const possibleWords = words.filter((word) => word.length === numGuesses);
+    const possibleWords = words.filter(
+      (word) => word.length === numberOfLetters
+    );
     const currentWord =
       possibleWords[Math.floor(Math.random() * possibleWords.length)].split("");
-    console.log(currentWord); //comment back in for testing
+    console.log(currentWord);
     setWord(currentWord);
+    dispatch(setNumberOfLetters(currentWord.length));
   };
 
   const handleNextLevel = () => {
     setGuessNumber(1);
-    setNumGuesses((previous) => previous + 1);
+    dispatch(setNumberOfLetters(numberOfLetters + 1));
+    dispatch(setNumberOfGuesses(numberOfGuesses + 1));
     dispatch(reduxSolved(false));
   };
 
@@ -91,8 +106,9 @@ function Home() {
     setGuessNumber(1);
     dispatch(reduxfailed(false));
     setGuessedWords([]);
-    if (numGuesses > 3) {
-      setNumGuesses(3);
+    if (numberOfGuesses > 3) {
+      dispatch(setNumberOfGuesses(3));
+      dispatch(setNumberOfLetters(3));
     } else {
       grabNewWord();
     }
@@ -100,10 +116,10 @@ function Home() {
 
   return (
     <div className="container mx-auto mt-5 p-4 relative">
-      <p className="text-xl font-semibold text-center mb-5">
-        Level {numGuesses - 2}
-      </p>
-      {[...Array(numGuesses).keys()].map((num) => {
+      <div className="flex justify-center">
+        <Title />
+      </div>
+      {[...Array(numberOfGuesses).keys()].map((num) => {
         return (
           <Guess
             key={num}
@@ -113,7 +129,6 @@ function Home() {
             setInputLetter={setInputLetter}
             guessNumber={guessNumber}
             setGuessNumber={setGuessNumber}
-            numLetters={numGuesses}
             incorrectWord={incorrectWord}
             setIncorrectWord={setIncorrectWord}
             guessedWords={guessedWords}
@@ -130,26 +145,34 @@ function Home() {
           <p className="text-xl text-green-500 mb-2 font-semibold">
             Great job!
           </p>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={handleNextLevel}
-          >
-            Next Level
-          </button>
+          {version==="classic" && <p>Come back tomorrow for a new challenge!</p>}
+          {version === "endless" && (
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              onClick={handleNextLevel}
+            >
+              Next Level
+            </button>
+          )}
         </div>
       )}
 
       {failed && (
         <div className="mt-4 text-center">
           <p className="text-xl text-red-500 font-semibold">Game Over</p>
-          <p>{numGuesses > 5 && `You reached level ${numGuesses - 2}!`}</p>
-          <button
-            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2"
-            onClick={handleTryAgain}
-          >
-            Try Again
-          </button>
-          <Popup message={word?.join("")} />
+          {version==="classic" && <p>Come back tomorrow for a new challenge!</p>}
+          {version === "endless" && (
+            <>
+              <p>`You reached level ${numberOfGuesses - 2}!`</p>
+              <button
+                className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2"
+                onClick={handleTryAgain}
+              >
+                Try Again
+              </button>
+            </>
+          )}
+          <Popup message={word?.join("").toUpperCase()} />
         </div>
       )}
 
