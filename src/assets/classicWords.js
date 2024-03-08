@@ -2316,7 +2316,7 @@ const classicWords = [
   "shave",
 ];
 
-const startDate = new Date('2024-03-06T00:00:00Z');
+const startDate = new Date("2024-03-06T00:00:00Z");
 
 const currentDate = new Date();
 
@@ -2328,8 +2328,9 @@ const numberOfDaysSinceStartDate = Math.floor(differenceInDays);
 
 let wordIndex = numberOfDaysSinceStartDate % classicWords.length;
 
-const todaysWord = classicWords[wordIndex];
+const todaysWord = {
+  word: classicWords[wordIndex],
+  index: wordIndex,
+};
 
 export default todaysWord;
-
-

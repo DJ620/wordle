@@ -6,6 +6,7 @@ import { reduxSolved } from "../store/slices/solvedSlice";
 import { reduxfailed } from "../store/slices/failedSlice";
 import words from "an-array-of-english-words";
 import { motion } from "framer-motion";
+import todaysWord from "../assets/classicWords";
 
 const Guess = ({
   index,
@@ -22,9 +23,12 @@ const Guess = ({
   setAlreadyGuessed,
 }) => {
   const dispatch = useDispatch();
-  const { numberOfLetters, numberOfGuesses } = useSelector(state => state.guessConfig);
+  const { numberOfLetters, numberOfGuesses } = useSelector(
+    (state) => state.guessConfig
+  );
   const solved = useSelector((state) => state.solved);
   const failed = useSelector((state) => state.failed);
+  const version = useSelector((state) => state.version);
   const [guess, setGuess] = useState([]);
 
   useEffect(() => {
@@ -106,19 +110,20 @@ const Guess = ({
         revealLetters(currentGuess, updatedGuess, index + 1);
       } else {
         dispatch(addGuessedLetters(currentGuess));
-        // const isSolved = Object.keys(
-        //   Object.groupBy(currentGuess, ({ result }) => result)
-        // );
-        let isSolved = currentGuess.map(letter => letter.result);
-        isSolved = isSolved.filter((letter, index) => isSolved.indexOf(letter) === index);
+        let isSolved = currentGuess.map((letter) => letter.result);
+        isSolved = isSolved.filter(
+          (letter, index) => isSolved.indexOf(letter) === index
+        );
         if (isSolved.length === 1 && isSolved[0] === "match") {
           dispatch(reduxSolved(true));
+          markDayPlayed("solved");
         }
         if (
           numberOfGuesses === guessNumber &&
           (isSolved.length > 1 || isSolved[0] !== "match")
         ) {
           dispatch(reduxfailed(true));
+          markDayPlayed("failed");
         }
         setGuessNumber((previous) => {
           if (previous < numberOfGuesses) {
@@ -127,6 +132,18 @@ const Guess = ({
         });
       }
     }, 250);
+  };
+
+  const markDayPlayed = (outcome) => {
+    if (version === "classic") {
+      const wordleInfo = JSON.parse(localStorage.getItem('wordleInfo')) || {
+        streak: 0,
+        lastIndexPlayed: todaysWord.index
+      };
+      wordleInfo.streak = outcome === "solved" ? wordleInfo.streak + 1 : 0;
+      wordleInfo.lastIndexPlayed = todaysWord.index;
+      localStorage.setItem("wordleInfo", JSON.stringify(wordleInfo));
+    };
   };
 
   return (
