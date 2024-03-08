@@ -17,14 +17,24 @@ const KeyboardLetter = ({ letter, handleLetterPress }) => {
 
   useEffect(() => {
     if (status === "pending" || status === "partial") {
-        const groupedLetters = Object.groupBy(guessedLetters, ({letter}) => letter);
+        // const groupedLetters = Object.groupBy(guessedLetters, ({letter}) => letter);
+        let groupedLetters = {};
+        guessedLetters.forEach(letter => {
+          if (groupedLetters[letter.letter]) {
+            groupedLetters[letter.letter].push(letter);
+          } else {
+            groupedLetters[letter.letter] = [letter];
+          }
+        })
     if (Object.keys(groupedLetters).includes(letter)) {
-        const groupedResults = Object.groupBy(groupedLetters[letter], ({result}) => result);
-        if (Object.keys(groupedResults).includes("match")) {
+        // const groupedResults = Object.groupBy(groupedLetters[letter], ({result}) => result);
+        let groupedResults = groupedLetters[letter].map(letter => letter.result);
+        groupedResults = groupedResults.filter((letter, index) => groupedResults.indexOf(letter) === index);
+        if (groupedResults.includes("match")) {
             setStatus("match");
-        } else if (Object.keys(groupedResults).includes("partial")) {
+        } else if (groupedResults.includes("partial")) {
             setStatus("partial");
-        } else if (Object.keys(groupedResults).includes("wrong")) {
+        } else if (groupedResults.includes("wrong")) {
             setStatus("wrong");
         };
     };

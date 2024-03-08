@@ -106,9 +106,11 @@ const Guess = ({
         revealLetters(currentGuess, updatedGuess, index + 1);
       } else {
         dispatch(addGuessedLetters(currentGuess));
-        const isSolved = Object.keys(
-          Object.groupBy(currentGuess, ({ result }) => result)
-        );
+        // const isSolved = Object.keys(
+        //   Object.groupBy(currentGuess, ({ result }) => result)
+        // );
+        let isSolved = currentGuess.map(letter => letter.result);
+        isSolved = isSolved.filter((letter, index) => isSolved.indexOf(letter) === index);
         if (isSolved.length === 1 && isSolved[0] === "match") {
           dispatch(reduxSolved(true));
         }
