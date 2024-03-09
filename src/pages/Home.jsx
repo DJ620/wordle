@@ -49,14 +49,14 @@ function Home() {
       setWord(todaysWord.word.split(""));
     } else if (pathname === "/endless") {
       dispatch(setVersion("endless"));
-      dispatch(setNumberOfGuesses(3));
+      dispatch(setNumberOfGuesses(6));
       dispatch(setNumberOfLetters(3));
     } else {
       dispatch(setVersion("custom"));
       const customWord = atob(params.encodedWord);
       setWord(customWord.split(""));
       dispatch(setNumberOfLetters(customWord.length));
-      dispatch(setNumberOfGuesses(params.customNumGuesses));
+      dispatch(setNumberOfGuesses(+params.customNumGuesses));
     }
     document.addEventListener("keydown", handleKeyPress, true);
     if (version === "custom") {
@@ -71,7 +71,7 @@ function Home() {
     if (version === "endless") {
       grabNewWord();
     }
-  }, [numberOfGuesses]);
+  }, [numberOfLetters]);
 
   useEffect(() => {
     if (incorrectWord) {
@@ -116,7 +116,7 @@ function Home() {
   const handleNextLevel = () => {
     setGuessNumber(1);
     dispatch(setNumberOfLetters(numberOfLetters + 1));
-    dispatch(setNumberOfGuesses(numberOfGuesses + 1));
+    // dispatch(setNumberOfGuesses(numberOfGuesses + 1));
     dispatch(reduxSolved(false));
   };
 
@@ -124,8 +124,8 @@ function Home() {
     setGuessNumber(1);
     dispatch(reduxfailed(false));
     setGuessedWords([]);
-    if (numberOfGuesses > 3) {
-      dispatch(setNumberOfGuesses(3));
+    if (numberOfLetters > 3) {
+      // dispatch(setNumberOfGuesses(3));
       dispatch(setNumberOfLetters(3));
     } else {
       grabNewWord();
@@ -186,7 +186,7 @@ function Home() {
           )}
           {version === "endless" && (
             <>
-              <p>`You reached level ${numberOfGuesses - 2}!`</p>
+              <p>{`You reached level ${numberOfGuesses - 2}!`}</p>
               <button
                 className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2"
                 onClick={handleTryAgain}

@@ -17,7 +17,6 @@ const KeyboardLetter = ({ letter, handleLetterPress }) => {
 
   useEffect(() => {
     if (status === "pending" || status === "partial") {
-        // const groupedLetters = Object.groupBy(guessedLetters, ({letter}) => letter);
         let groupedLetters = {};
         guessedLetters.forEach(letter => {
           if (groupedLetters[letter.letter]) {
@@ -27,7 +26,6 @@ const KeyboardLetter = ({ letter, handleLetterPress }) => {
           }
         })
     if (Object.keys(groupedLetters).includes(letter)) {
-        // const groupedResults = Object.groupBy(groupedLetters[letter], ({result}) => result);
         let groupedResults = groupedLetters[letter].map(letter => letter.result);
         groupedResults = groupedResults.filter((letter, index) => groupedResults.indexOf(letter) === index);
         if (groupedResults.includes("match")) {
@@ -45,7 +43,7 @@ const KeyboardLetter = ({ letter, handleLetterPress }) => {
     <div
       onClick={() => handleLetterPress(letter)}
       key={letter}
-      className={`rounded-md px-2 py-1 ${letter.length > 1 ? "w-16" : "w-8"} h-8 text-center cursor-pointer flex justify-center ${
+      className={`rounded-md px-2 py-1 ${letter.length > 1 ? "w-16" : "w-9"} h-8 text-center cursor-pointer flex justify-center ${
         status === "match" ? "bg-green-600" :
         status === "partial" ? "bg-yellow-500" :
         status === "wrong" ? "bg-gray-700" :

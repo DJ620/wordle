@@ -2320,7 +2320,9 @@ const startDate = new Date("2024-03-06T00:00:00Z");
 
 const currentDate = new Date();
 
-const differenceInMilliseconds = currentDate - startDate;
+const startDateLocal = new Date(startDate.toLocaleString('en-US', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }));
+
+const differenceInMilliseconds = currentDate - startDateLocal;
 
 const differenceInDays = differenceInMilliseconds / (1000 * 60 * 60 * 24);
 
