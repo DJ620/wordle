@@ -58,7 +58,7 @@ const LandingPage = () => {
           <p>Come back tomorrow for a new challenge!</p>
         )}
       </div>
-      {/* <div className="flex justify-center gap-10 mt-10">
+      <div className="flex justify-center gap-10 mt-10">
         <button
           onClick={handlePlayEndless}
           className="bg-green-600 hover:bg-green-700 text-white font-semibold w-42 py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
@@ -72,7 +72,7 @@ const LandingPage = () => {
           Custom Wordle
         </button>
         <CustomModal show={showModal} setShow={setShowModal} />
-      </div> */}
+      </div>
     </div>
   );
 };

@@ -3,6 +3,9 @@ import words from "an-array-of-english-words";
 import { LuCopy, LuCopyCheck } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 
+const baseUrl = "https://dj620.github.io";
+// const baseUrl = 'http://localhost:5173';
+
 const CustomModal = ({ show, setShow }) => {
   const navigate = useNavigate();
   const [word, setWord] = useState("");
@@ -26,7 +29,7 @@ const CustomModal = ({ show, setShow }) => {
       setUrlCopied(false);
       const encodedWord = btoa(word);
       setCustomUrl(
-        `localhost:5173/wordle/#/custom/${encodedWord}/${numGuesses}`
+        `${baseUrl}/wordle/#/custom/${encodedWord}/${numGuesses}`
       );
     } else {
       setUnacceptedWord(true);
