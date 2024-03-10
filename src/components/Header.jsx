@@ -8,7 +8,7 @@ const Header = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="w-full border-b border-gray-400 bg-black fixed top-0 py-3 px-5 sm:px-10  z-50">
+    <div className="w-full border-b border-gray-400 bg-black fixed top-0 py-3 px-5 sm:px-10 z-50">
       <div className="flex justify-between sm:justify-center items-center">
         <HeaderTitle />
         <FaHome
