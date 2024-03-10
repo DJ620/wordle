@@ -7,15 +7,21 @@ import Modal from "../components/Modal";
 import CreateCustomWordle from "../components/CreateCustomWordle";
 import { BsQuestionSquareFill } from "react-icons/bs";
 import HowToPlay from "../components/HowToPlay";
-
+import { setSolved } from "../store/slices/solvedSlice";
+import { setFailed } from "../store/slices/failedSlice";
+import { setVersion } from "../store/slices/versionSlice";
+import { setNumberOfLetters } from "../store/slices/guessConfigSlice";
 
 const LandingPage = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [hasClassicWordToPlay, setHasClassicWordToPlay] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
 
   useEffect(() => {
+    dispatch(setSolved(false));
+    dispatch(setFailed(false));
     const wordleInfo = JSON.parse(localStorage.getItem("wordleInfo"));
     if (wordleInfo) {
       if (wordleInfo.lastIndexPlayed === todaysWord.index) {
@@ -25,15 +31,24 @@ const LandingPage = () => {
   }, []);
 
   const handlePlayClassic = () => {
+    dispatch(setVersion("classic"));
     navigate("/classic");
   };
 
   const handlePlayEndless = () => {
+    dispatch(setVersion("endless"));
+    dispatch(setNumberOfLetters(3));
     navigate("/endless");
   };
 
   return (
     <div className="bg-black h-screen pt-20">
+      <div className="flex justify-end max-w-2xl pr-5 sm:pr-0 mx-auto -mt-10 mb-5">
+        <BsQuestionSquareFill
+          onClick={() => setShowInfo(true)}
+          className="text-2xl hover:text-gray-300 cursor-pointer"
+        />
+      </div>
       <div className="max-w-2xl h-fit mx-auto p-8 bg-gray-700 shadow-md rounded-md text-center relative">
         <Title />
         <p className="text-white mb-8 text-3xl font-extrabold">
@@ -63,9 +78,6 @@ const LandingPage = () => {
         >
           Custom Wordle
         </button>
-      </div>
-      <div className="flex justify-center mt-10">
-      <BsQuestionSquareFill onClick={() => setShowInfo(true)} className="text-4xl text-gray-400 hover:text-gray-500 cursor-pointer"/>
       </div>
       <Modal show={showInfo} setShow={setShowInfo}>
         <HowToPlay />

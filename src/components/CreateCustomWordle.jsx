@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import words from "an-array-of-english-words";
 import { LuCopy, LuCopyCheck } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setVersion } from "../store/slices/versionSlice";
 
 const baseUrl = "https://dj620.github.io";
 // const baseUrl = 'http://localhost:5173';
 
 const CreateCustomWordle = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [word, setWord] = useState("");
   const [numGuesses, setNumGuesses] = useState(6);
@@ -41,6 +44,7 @@ const CreateCustomWordle = () => {
   };
 
   const handlePlayCustom = () => {
+    dispatch(setVersion("custom"));
     const encodedWord = btoa(word);
     navigate(`/custom/${encodedWord}/${numGuesses}`);
   };

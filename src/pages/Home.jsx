@@ -16,7 +16,6 @@ import words from "an-array-of-english-words";
 import Popup from "../components/Popup";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import todaysWord from "../assets/classicWords";
-import Title from "../components/Title";
 import Confetti from "react-confetti";
 import Modal from "../components/Modal";
 import Header from "../components/Header";
@@ -42,6 +41,9 @@ function Home() {
   const [showFailed, setShowFailed] = useState(false);
 
   useEffect(() => {
+    console.log({pathname})
+    dispatch(setSolved(false));
+    dispatch(setFailed(false));
     const wordleInfo = JSON.parse(localStorage.getItem("wordleInfo"));
     if (
       wordleInfo?.lastIndexPlayed === todaysWord.index &&
@@ -66,13 +68,16 @@ function Home() {
       dispatch(setNumberOfGuesses(+params.customNumGuesses));
     }
     document.addEventListener("keydown", handleKeyPress, true);
+  }, []);
+
+  useEffect(() => {
     if (version === "custom") {
       const customWord = atob(params.encodedWord);
       setWord(customWord.split(""));
       dispatch(setNumberOfLetters(customWord.length));
-      dispatch(setNumberOfGuesses(params.customNumGuesses));
+      dispatch(setNumberOfGuesses(+params.customNumGuesses));
     }
-  }, []);
+  }, [version]);
 
   useEffect(() => {
     if (version === "endless") {
@@ -159,21 +164,11 @@ function Home() {
     }
   };
 
-  const setShowSolvedModal = (show) => {
-    dispatch(setSolved(show));
-  };
-
-  const setShowFailedModal = (show) => {
-    dispatch(setFailed(show));
-  };
-
   return (
     <div>
       <Header />
       <div className="container mx-auto mt-20 p-4 relative">
-        <div className="flex justify-center">
-          {/* <Title /> */}
-        </div>
+        <div className="flex justify-center">{/* <Title /> */}</div>
         {[...Array(numberOfGuesses).keys()].map((num) => {
           return (
             <Guess
@@ -196,13 +191,29 @@ function Home() {
         <Keyboard handleLetterPress={handleLetterPress} />
 
         {solved && <Confetti recycle={false} />}
-        <Modal show={showSolved} setShow={setShowSolvedModal}>
+        <Modal show={showSolved}>
           <div className="mt-4 text-center">
             <p className="text-xl text-green-500 mb-2 font-semibold">
               Great job!
             </p>
             {version === "classic" && (
-              <p>Come back tomorrow for a new challenge!</p>
+              <>
+                <p>Come back tomorrow for a new challenge!</p>
+                <div className="flex justify-center gap-5 mt-5">
+                  <button
+                    onClick={() => navigate("/endless")}
+                    className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded w-full max-w-xs"
+                  >
+                    Endless Wordle
+                  </button>
+                  <button
+                    onClick={() => navigate("/")}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full max-w-xs"
+                  >
+                    Home
+                  </button>
+                </div>
+              </>
             )}
             {version === "endless" && (
               <button
@@ -212,26 +223,66 @@ function Home() {
                 Next Level
               </button>
             )}
+            {version === "custom" && (
+              <button
+              onClick={() => navigate("/")}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full max-w-xs mt-2"
+            >
+              Home
+            </button>
+            )}
           </div>
         </Modal>
 
         {failed && <Popup message={word?.join("").toUpperCase()} />}
-        <Modal show={showFailed} showModal={setShowFailedModal}>
+        <Modal show={showFailed}>
           <div className="mt-4 text-center">
             <p className="text-xl text-red-500 font-semibold">Game Over</p>
             {version === "classic" && (
-              <p>Come back tomorrow for a new challenge!</p>
+              <div>
+                <p>Come back tomorrow for a new challenge!</p>
+                <div className="flex justify-center gap-5 mt-5">
+                  <button
+                    onClick={() => navigate("/endless")}
+                    className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded w-full max-w-xs"
+                  >
+                    Endless Wordle
+                  </button>
+                  <button
+                    onClick={() => navigate("/")}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full max-w-xs"
+                  >
+                    Home
+                  </button>
+                </div>
+              </div>
             )}
             {version === "endless" && (
               <>
                 <p>{`You reached level ${numberOfLetters - 2}!`}</p>
-                <button
-                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2"
-                  onClick={handleTryAgain}
-                >
-                  Try Again
-                </button>
+                <div className="flex justify-center gap-10 mt-5">
+                  <button
+                    className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full max-w-xs"
+                    onClick={handleTryAgain}
+                  >
+                    Try Again
+                  </button>
+                  <button
+                    onClick={() => navigate("/")}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full max-w-xs"
+                  >
+                    Home
+                  </button>
+                </div>
               </>
+            )}
+             {version === "custom" && (
+              <button
+              onClick={() => navigate("/")}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full max-w-xs mt-2"
+            >
+              Home
+            </button>
             )}
           </div>
         </Modal>
