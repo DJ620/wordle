@@ -10,14 +10,16 @@ import {
   setNumberOfGuesses,
   setNumberOfLetters,
 } from "../store/slices/guessConfigSlice";
-import { reduxSolved } from "../store/slices/solvedSlice";
-import { reduxfailed } from "../store/slices/failedSlice";
+import { setSolved } from "../store/slices/solvedSlice";
+import { setFailed } from "../store/slices/failedSlice";
 import words from "an-array-of-english-words";
 import Popup from "../components/Popup";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import todaysWord from "../assets/classicWords";
 import Title from "../components/Title";
 import Confetti from "react-confetti";
+import Modal from "../components/Modal";
+import Header from "../components/Header";
 
 function Home() {
   const { pathname } = useLocation();
@@ -36,10 +38,15 @@ function Home() {
   const [guessNumber, setGuessNumber] = useState(1);
   const [incorrectWord, setIncorrectWord] = useState(false);
   const [alreadyGuessed, setAlreadyGuessed] = useState(false);
+  const [showSolved, setShowSolved] = useState(false);
+  const [showFailed, setShowFailed] = useState(false);
 
   useEffect(() => {
     const wordleInfo = JSON.parse(localStorage.getItem("wordleInfo"));
-    if (wordleInfo?.lastIndexPlayed === todaysWord.index && pathname === "/classic") {
+    if (
+      wordleInfo?.lastIndexPlayed === todaysWord.index &&
+      pathname === "/classic"
+    ) {
       return navigate("/");
     }
     if (pathname === "/classic") {
@@ -89,6 +96,26 @@ function Home() {
     }
   }, [alreadyGuessed]);
 
+  useEffect(() => {
+    if (solved) {
+      setTimeout(() => {
+        setShowSolved(true);
+      }, numberOfLetters * 500);
+    } else {
+      setShowSolved(false);
+    }
+  }, [solved]);
+
+  useEffect(() => {
+    if (failed) {
+      setTimeout(() => {
+        setShowFailed(true);
+      }, 2000);
+    } else {
+      setShowFailed(false);
+    }
+  }, [failed]);
+
   const handleKeyPress = (e) => {
     setInputLetter(e.key);
   };
@@ -117,12 +144,12 @@ function Home() {
     setGuessNumber(1);
     dispatch(setNumberOfLetters(numberOfLetters + 1));
     // dispatch(setNumberOfGuesses(numberOfGuesses + 1));
-    dispatch(reduxSolved(false));
+    dispatch(setSolved(false));
   };
 
   const handleTryAgain = () => {
     setGuessNumber(1);
-    dispatch(reduxfailed(false));
+    dispatch(setFailed(false));
     setGuessedWords([]);
     if (numberOfLetters > 3) {
       // dispatch(setNumberOfGuesses(3));
@@ -132,76 +159,87 @@ function Home() {
     }
   };
 
+  const setShowSolvedModal = (show) => {
+    dispatch(setSolved(show));
+  };
+
+  const setShowFailedModal = (show) => {
+    dispatch(setFailed(show));
+  };
+
   return (
-    <div className="container mx-auto mt-5 p-4 relative">
-      <div className="flex justify-center">
-        <Title />
-      </div>
-      {[...Array(numberOfGuesses).keys()].map((num) => {
-        return (
-          <Guess
-            key={num}
-            index={num}
-            word={word}
-            inputLetter={guessNumber === num + 1 ? inputLetter : null}
-            setInputLetter={setInputLetter}
-            guessNumber={guessNumber}
-            setGuessNumber={setGuessNumber}
-            incorrectWord={incorrectWord}
-            setIncorrectWord={setIncorrectWord}
-            guessedWords={guessedWords}
-            setGuessedWords={setGuessedWords}
-            alreadyGuessed={alreadyGuessed}
-            setAlreadyGuessed={setAlreadyGuessed}
-          />
-        );
-      })}
-      <Keyboard handleLetterPress={handleLetterPress} />
-
-      {solved && (
-        <div className="mt-4 text-center">
-          <p className="text-xl text-green-500 mb-2 font-semibold">
-            Great job!
-          </p>
-          {version === "classic" && (
-            <p>Come back tomorrow for a new challenge!</p>
-          )}
-          {version === "endless" && (
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              onClick={handleNextLevel}
-            >
-              Next Level
-            </button>
-          )}
-          <Confetti recycle={false} />
+    <div>
+      <Header />
+      <div className="container mx-auto mt-20 p-4 relative">
+        <div className="flex justify-center">
+          {/* <Title /> */}
         </div>
-      )}
+        {[...Array(numberOfGuesses).keys()].map((num) => {
+          return (
+            <Guess
+              key={num}
+              index={num}
+              word={word}
+              inputLetter={guessNumber === num + 1 ? inputLetter : null}
+              setInputLetter={setInputLetter}
+              guessNumber={guessNumber}
+              setGuessNumber={setGuessNumber}
+              incorrectWord={incorrectWord}
+              setIncorrectWord={setIncorrectWord}
+              guessedWords={guessedWords}
+              setGuessedWords={setGuessedWords}
+              alreadyGuessed={alreadyGuessed}
+              setAlreadyGuessed={setAlreadyGuessed}
+            />
+          );
+        })}
+        <Keyboard handleLetterPress={handleLetterPress} />
 
-      {failed && (
-        <div className="mt-4 text-center">
-          <p className="text-xl text-red-500 font-semibold">Game Over</p>
-          {version === "classic" && (
-            <p>Come back tomorrow for a new challenge!</p>
-          )}
-          {version === "endless" && (
-            <>
-              <p>{`You reached level ${numberOfGuesses - 2}!`}</p>
+        {solved && <Confetti recycle={false} />}
+        <Modal show={showSolved} setShow={setShowSolvedModal}>
+          <div className="mt-4 text-center">
+            <p className="text-xl text-green-500 mb-2 font-semibold">
+              Great job!
+            </p>
+            {version === "classic" && (
+              <p>Come back tomorrow for a new challenge!</p>
+            )}
+            {version === "endless" && (
               <button
-                className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2"
-                onClick={handleTryAgain}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                onClick={handleNextLevel}
               >
-                Try Again
+                Next Level
               </button>
-            </>
-          )}
-          <Popup message={word?.join("").toUpperCase()} />
-        </div>
-      )}
+            )}
+          </div>
+        </Modal>
 
-      {incorrectWord && <Popup message="Not in word list" />}
+        {failed && <Popup message={word?.join("").toUpperCase()} />}
+        <Modal show={showFailed} showModal={setShowFailedModal}>
+          <div className="mt-4 text-center">
+            <p className="text-xl text-red-500 font-semibold">Game Over</p>
+            {version === "classic" && (
+              <p>Come back tomorrow for a new challenge!</p>
+            )}
+            {version === "endless" && (
+              <>
+                <p>{`You reached level ${numberOfLetters - 2}!`}</p>
+                <button
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-2"
+                  onClick={handleTryAgain}
+                >
+                  Try Again
+                </button>
+              </>
+            )}
+          </div>
+        </Modal>
 
-      {alreadyGuessed && <Popup message="Word already guessed" />}
+        {incorrectWord && <Popup message="Not in word list" />}
+
+        {alreadyGuessed && <Popup message="Word already guessed" />}
+      </div>
     </div>
   );
 }

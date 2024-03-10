@@ -4,12 +4,12 @@ const solvedSlice = createSlice({
     name: "solved",
     initialState: false,
     reducers: {
-        reduxSolved: (state, action) => {
+        setSolved: (state, action) => {
             return state = action.payload;
         }
     }
 });
 
-export const { reduxSolved } = solvedSlice.actions;
+export const { setSolved } = solvedSlice.actions;
 
 export default solvedSlice.reducer;

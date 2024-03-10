@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import Letter from "./Letter";
 import { useDispatch, useSelector } from "react-redux";
 import { addGuessedLetters } from "../store/slices/letterSlice";
-import { reduxSolved } from "../store/slices/solvedSlice";
-import { reduxfailed } from "../store/slices/failedSlice";
+import { setSolved } from "../store/slices/solvedSlice";
+import { setFailed } from "../store/slices/failedSlice";
 import words from "an-array-of-english-words";
 import { motion } from "framer-motion";
 import todaysWord from "../assets/classicWords";
@@ -115,14 +115,14 @@ const Guess = ({
           (letter, index) => isSolved.indexOf(letter) === index
         );
         if (isSolved.length === 1 && isSolved[0] === "match") {
-          dispatch(reduxSolved(true));
+          dispatch(setSolved(true));
           markDayPlayed("solved");
         }
         if (
           numberOfGuesses === guessNumber &&
           (isSolved.length > 1 || isSolved[0] !== "match")
         ) {
-          dispatch(reduxfailed(true));
+          dispatch(setFailed(true));
           markDayPlayed("failed");
         }
         setGuessNumber((previous) => {

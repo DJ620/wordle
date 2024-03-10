@@ -4,12 +4,12 @@ const failedSlice = createSlice({
     name: "solved",
     initialState: false,
     reducers: {
-        reduxfailed: (state, action) => {
+        setFailed: (state, action) => {
             return state = action.payload;
         }
     }
 });
 
-export const { reduxfailed } = failedSlice.actions;
+export const { setFailed } = failedSlice.actions;
 
 export default failedSlice.reducer;
