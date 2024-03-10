@@ -3,7 +3,8 @@ import Title from "../components/Title";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import todaysWord from "../assets/classicWords";
-import CustomModal from "../components/CustomModal";
+import Modal from "../components/Modal";
+import CreateCustomWordle from "../components/CreateCustomWordle";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -71,7 +72,9 @@ const LandingPage = () => {
         >
           Custom Wordle
         </button>
-        <CustomModal show={showModal} setShow={setShowModal} />
+        <Modal show={showModal} setShow={setShowModal}>
+          <CreateCustomWordle />
+        </Modal>
       </div>
     </div>
   );
