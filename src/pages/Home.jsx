@@ -149,7 +149,7 @@ function Home() {
     );
     const currentWord =
       possibleWords[Math.floor(Math.random() * possibleWords.length)].split("");
-    console.log(currentWord);
+    // console.log(currentWord);
     setWord(currentWord);
     dispatch(setNumberOfLetters(currentWord.length));
   };
