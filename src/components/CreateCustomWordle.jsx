@@ -16,6 +16,7 @@ const CreateCustomWordle = () => {
   const [customUrl, setCustomUrl] = useState("");
   const [unacceptedWord, setUnacceptedWord] = useState(false);
   const [urlCopied, setUrlCopied] = useState(false);
+  const [showCopied, setShowCopied] = useState(false);
 
   useEffect(() => {
     setWord("");
@@ -24,6 +25,14 @@ const CreateCustomWordle = () => {
     setUrlCopied(false);
     setUnacceptedWord(false);
   }, []);
+
+  useEffect(() => {
+    if (showCopied) {
+      setTimeout(() => {
+        setShowCopied(false);
+      }, 1000)
+    };
+  }, [showCopied]);
 
   const handleGenerateUrl = (e) => {
     e.preventDefault();
@@ -41,6 +50,7 @@ const CreateCustomWordle = () => {
   const handleCopyUrl = () => {
     navigator.clipboard.writeText(customUrl);
     setUrlCopied(true);
+    setShowCopied(true);
   };
 
   const handlePlayCustom = () => {
@@ -84,8 +94,9 @@ const CreateCustomWordle = () => {
       </form>
       {customUrl !== "" && (
         <div className="mt-6">
-          <div className="flex justify-between items-end gap-2">
+          <div className="flex justify-between items-end gap-2 relative">
             <p>Custom Wordle URL:</p>
+            {showCopied && <p className="absolute right-7 top-0 bg-white text-black px-2 rounded text-xs">url copied!</p>}
             {urlCopied ? (
               <LuCopyCheck
                 onClick={handleCopyUrl}
