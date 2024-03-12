@@ -163,6 +163,7 @@ function Home() {
 
   const handleTryAgain = () => {
     dispatch(setGuessNumber(1));
+    dispatch(resetGuessedLetters());
     dispatch(setVersion("endless"));
     dispatch(setFailed(false));
     dispatch(setSolved(false));
