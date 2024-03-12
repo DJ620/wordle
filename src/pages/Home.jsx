@@ -9,6 +9,7 @@ import { setVersion } from "../store/slices/versionSlice";
 import {
   setNumberOfGuesses,
   setNumberOfLetters,
+  setGuessNumber
 } from "../store/slices/guessConfigSlice";
 import { setSolved } from "../store/slices/solvedSlice";
 import { setFailed } from "../store/slices/failedSlice";
@@ -19,29 +20,35 @@ import todaysWord from "../assets/classicWords";
 import Confetti from "react-confetti";
 import Modal from "../components/Modal";
 import Header from "../components/Header";
+import { resetGuessedLetters } from "../store/slices/letterSlice";
 
 function Home() {
   const { pathname } = useLocation();
   const params = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { numberOfGuesses, numberOfLetters } = useSelector(
+  const { numberOfGuesses, numberOfLetters, guessNumber } = useSelector(
     (state) => state.guessConfig
   );
   const version = useSelector((state) => state.version);
   const solved = useSelector((state) => state.solved);
   const failed = useSelector((state) => state.failed);
+  const streak = useSelector((state) => state.streak);
   const [word, setWord] = useState("");
   const [guessedWords, setGuessedWords] = useState([]);
   const [inputLetter, setInputLetter] = useState("");
-  const [guessNumber, setGuessNumber] = useState(1);
   const [incorrectWord, setIncorrectWord] = useState(false);
   const [alreadyGuessed, setAlreadyGuessed] = useState(false);
   const [showSolved, setShowSolved] = useState(false);
   const [showFailed, setShowFailed] = useState(false);
 
   useEffect(() => {
-    console.log({pathname})
+    dispatch(addWord(word));
+  }, [word]);
+
+  useEffect(() => {
+    dispatch(resetGuessedLetters());
+    dispatch(setGuessNumber(1));
     dispatch(setSolved(false));
     dispatch(setFailed(false));
     const wordleInfo = JSON.parse(localStorage.getItem("wordleInfo"));
@@ -68,9 +75,10 @@ function Home() {
       dispatch(setNumberOfGuesses(+params.customNumGuesses));
     }
     document.addEventListener("keydown", handleKeyPress, true);
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
+    dispatch(resetGuessedLetters());
     if (version === "custom") {
       const customWord = atob(params.encodedWord);
       setWord(customWord.split(""));
@@ -80,6 +88,7 @@ function Home() {
   }, [version]);
 
   useEffect(() => {
+    dispatch(resetGuessedLetters());
     if (version === "endless") {
       grabNewWord();
     }
@@ -146,15 +155,17 @@ function Home() {
   };
 
   const handleNextLevel = () => {
-    setGuessNumber(1);
+    dispatch(setGuessNumber(1));
     dispatch(setNumberOfLetters(numberOfLetters + 1));
     // dispatch(setNumberOfGuesses(numberOfGuesses + 1));
     dispatch(setSolved(false));
   };
 
   const handleTryAgain = () => {
-    setGuessNumber(1);
+    dispatch(setGuessNumber(1));
+    dispatch(setVersion("endless"));
     dispatch(setFailed(false));
+    dispatch(setSolved(false));
     setGuessedWords([]);
     if (numberOfLetters > 3) {
       // dispatch(setNumberOfGuesses(3));
@@ -162,23 +173,42 @@ function Home() {
     } else {
       grabNewWord();
     }
+    navigate("/endless");
+  };
+
+  const HomeButton = () => {
+    return (
+      <button
+        onClick={() => navigate("/")}
+        className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full max-w-xs"
+      >
+        Home
+      </button>
+    );
+  };
+
+  const EndlessButton = () => {
+    return (
+      <button
+        onClick={() => navigate("/endless")}
+        className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded w-full max-w-xs"
+      >
+        Endless Wordle
+      </button>
+    );
   };
 
   return (
     <div>
       <Header />
       <div className="container mx-auto mt-20 p-4 relative">
-        <div className="flex justify-center">{/* <Title /> */}</div>
         {[...Array(numberOfGuesses).keys()].map((num) => {
           return (
             <Guess
               key={num}
               index={num}
-              word={word}
               inputLetter={guessNumber === num + 1 ? inputLetter : null}
               setInputLetter={setInputLetter}
-              guessNumber={guessNumber}
-              setGuessNumber={setGuessNumber}
               incorrectWord={incorrectWord}
               setIncorrectWord={setIncorrectWord}
               guessedWords={guessedWords}
@@ -191,69 +221,59 @@ function Home() {
         <Keyboard handleLetterPress={handleLetterPress} />
 
         {solved && <Confetti recycle={false} />}
-        <Modal show={showSolved}>
+        <Modal show={showSolved} setShow={setShowSolved}>
           <div className="mt-4 text-center">
-            <p className="text-xl text-green-500 mb-2 font-semibold">
+            <p className="text-2xl text-green-500 mb-2 font-semibold">
               Great job!
             </p>
+            {streak > 1 && <><p className="text-xl mb-2 font-bold">You're on a roll! You've correctly guessed the last {streak} words in a row!</p><hr className="mb-2" /></>}
             {version === "classic" && (
               <>
                 <p>Come back tomorrow for a new challenge!</p>
                 <div className="flex justify-center gap-5 mt-5">
-                  <button
-                    onClick={() => navigate("/endless")}
-                    className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded w-full max-w-xs"
-                  >
-                    Endless Wordle
-                  </button>
-                  <button
-                    onClick={() => navigate("/")}
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full max-w-xs"
-                  >
-                    Home
-                  </button>
+                  <EndlessButton />
+                  <HomeButton />
                 </div>
               </>
             )}
             {version === "endless" && (
-              <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                onClick={handleNextLevel}
-              >
-                Next Level
-              </button>
+              <div className="flex justify-center gap-5 mt-5">
+                <button
+                  className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded w-full max-w-xs"
+                  onClick={handleNextLevel}
+                >
+                  Next Level
+                </button>
+                <HomeButton />
+              </div>
             )}
             {version === "custom" && (
-              <button
-              onClick={() => navigate("/")}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full max-w-xs mt-2"
-            >
-              Home
-            </button>
+              <>
+                <button
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded w-full max-w-xs"
+                  onClick={() => navigate("/classic")}
+                >
+                  Play Classic Wordle
+                </button>
+                <div className="flex justify-center gap-5 mt-5">
+                  <EndlessButton />
+                  <HomeButton />
+                </div>
+              </>
             )}
           </div>
         </Modal>
 
         {failed && <Popup message={word?.join("").toUpperCase()} />}
-        <Modal show={showFailed}>
+        <Modal show={showFailed} setShow={setShowFailed}>
           <div className="mt-4 text-center">
             <p className="text-xl text-red-500 font-semibold">Game Over</p>
             {version === "classic" && (
               <div>
                 <p>Come back tomorrow for a new challenge!</p>
                 <div className="flex justify-center gap-5 mt-5">
-                  <button
-                    onClick={() => navigate("/endless")}
-                    className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded w-full max-w-xs"
-                  >
-                    Endless Wordle
-                  </button>
-                  <button
-                    onClick={() => navigate("/")}
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full max-w-xs"
-                  >
-                    Home
-                  </button>
+                  <EndlessButton />
+                  <HomeButton />
                 </div>
               </div>
             )}
@@ -267,22 +287,15 @@ function Home() {
                   >
                     Try Again
                   </button>
-                  <button
-                    onClick={() => navigate("/")}
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full max-w-xs"
-                  >
-                    Home
-                  </button>
+                  <HomeButton />
                 </div>
               </>
             )}
-             {version === "custom" && (
-              <button
-              onClick={() => navigate("/")}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full max-w-xs mt-2"
-            >
-              Home
-            </button>
+            {version === "custom" && (
+              <div className="flex justify-center gap-5 mt-5">
+                <EndlessButton />
+                <HomeButton />
+              </div>
             )}
           </div>
         </Modal>

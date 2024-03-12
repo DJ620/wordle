@@ -5,6 +5,7 @@ import solvedReducer from "./slices/solvedSlice";
 import failedReducer from './slices/failedSlice';
 import versionReducer from './slices/versionSlice';
 import guessConfigReducer from "./slices/guessConfigSlice";
+import streakReducer from "./slices/streakSlice";
 
 const store = configureStore({
     reducer: {
@@ -13,7 +14,8 @@ const store = configureStore({
         solved: solvedReducer,
         failed: failedReducer,
         version: versionReducer,
-        guessConfig: guessConfigReducer
+        guessConfig: guessConfigReducer,
+        streak: streakReducer
     }
 });
 

@@ -2316,13 +2316,15 @@ const classicWords = [
   "shave",
 ];
 
-const startDate = new Date("2024-03-06T00:00:00Z");
+const startDate = new Date("2024-03-06T00:00:00");
 
 const currentDate = new Date();
 
-const startDateLocal = new Date(startDate.toLocaleString('en-US', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }));
+const startOfDayStartDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
 
-const differenceInMilliseconds = currentDate - startDateLocal;
+const startOfDayCurrentDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+
+const differenceInMilliseconds = startOfDayCurrentDate - startOfDayStartDate;
 
 const differenceInDays = differenceInMilliseconds / (1000 * 60 * 60 * 24);
 

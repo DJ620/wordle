@@ -6,10 +6,13 @@ const guessedLettersSlice = createSlice({
     reducers: {
         addGuessedLetters: (state, action) => {
             return state = action.payload;
+        },
+        resetGuessedLetters: (state, action) => {
+            return state = [];
         }
     }
 });
 
-export const { addGuessedLetters } = guessedLettersSlice.actions;
+export const { addGuessedLetters, resetGuessedLetters } = guessedLettersSlice.actions;
 
 export default guessedLettersSlice.reducer;

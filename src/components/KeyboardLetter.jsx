@@ -4,8 +4,9 @@ import { useSelector } from "react-redux";
 
 const KeyboardLetter = ({ letter, handleLetterPress }) => {
   const guessedLetters = useSelector((state) => state.guessedLetters);
-  const solved = useSelector(state => state.solved);
-  const failed = useSelector(state => state.failed);
+  const word = useSelector((state) => state.word);
+  const solved = useSelector((state) => state.solved);
+  const failed = useSelector((state) => state.failed);
 
   const [status, setStatus] = useState("pending");
 
@@ -13,29 +14,33 @@ const KeyboardLetter = ({ letter, handleLetterPress }) => {
     if (!solved && !failed) {
       setStatus("pending");
     }
-  }, [solved, failed]);
+  }, [solved, failed, word]);
 
   useEffect(() => {
     if (status === "pending" || status === "partial") {
-        let groupedLetters = {};
-        guessedLetters.forEach(letter => {
-          if (groupedLetters[letter.letter]) {
-            groupedLetters[letter.letter].push(letter);
-          } else {
-            groupedLetters[letter.letter] = [letter];
-          }
-        })
-    if (Object.keys(groupedLetters).includes(letter)) {
-        let groupedResults = groupedLetters[letter].map(letter => letter.result);
-        groupedResults = groupedResults.filter((letter, index) => groupedResults.indexOf(letter) === index);
+      let groupedLetters = {};
+      guessedLetters.forEach((letter) => {
+        if (groupedLetters[letter.letter]) {
+          groupedLetters[letter.letter].push(letter);
+        } else {
+          groupedLetters[letter.letter] = [letter];
+        }
+      });
+      if (Object.keys(groupedLetters).includes(letter)) {
+        let groupedResults = groupedLetters[letter].map(
+          (letter) => letter.result
+        );
+        groupedResults = groupedResults.filter(
+          (letter, index) => groupedResults.indexOf(letter) === index
+        );
         if (groupedResults.includes("match")) {
-            setStatus("match");
+          setStatus("match");
         } else if (groupedResults.includes("partial")) {
-            setStatus("partial");
+          setStatus("partial");
         } else if (groupedResults.includes("wrong")) {
-            setStatus("wrong");
-        };
-    };
+          setStatus("wrong");
+        }
+      }
     }
   }, [guessedLetters]);
 
@@ -43,11 +48,16 @@ const KeyboardLetter = ({ letter, handleLetterPress }) => {
     <div
       onClick={() => handleLetterPress(letter)}
       key={letter}
-      className={`rounded-md px-2 py-1 ${letter.length > 1 ? "w-16" : "w-9"} h-8 text-center cursor-pointer flex justify-center ${
-        status === "match" ? "bg-green-600" :
-        status === "partial" ? "bg-yellow-500" :
-        status === "wrong" ? "bg-gray-700" :
-        "bg-gray-500"
+      className={`rounded-md px-2 py-1 ${
+        letter.length > 1 ? "w-16" : "w-9"
+      } h-8 text-center cursor-pointer flex justify-center ${
+        status === "match"
+          ? "bg-green-600"
+          : status === "partial"
+          ? "bg-yellow-500"
+          : status === "wrong"
+          ? "bg-gray-700"
+          : "bg-gray-500"
       }`}
     >
       {letter === "Backspace" ? (

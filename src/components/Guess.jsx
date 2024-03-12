@@ -4,17 +4,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { addGuessedLetters } from "../store/slices/letterSlice";
 import { setSolved } from "../store/slices/solvedSlice";
 import { setFailed } from "../store/slices/failedSlice";
+import { setStreak } from "../store/slices/streakSlice";
+import { setGuessNumber } from "../store/slices/guessConfigSlice";
 import words from "an-array-of-english-words";
 import { motion } from "framer-motion";
 import todaysWord from "../assets/classicWords";
 
 const Guess = ({
   index,
-  word,
   inputLetter,
   setInputLetter,
-  guessNumber,
-  setGuessNumber,
   incorrectWord,
   setIncorrectWord,
   guessedWords,
@@ -26,9 +25,11 @@ const Guess = ({
   const { numberOfLetters, numberOfGuesses } = useSelector(
     (state) => state.guessConfig
   );
+  const word = useSelector((state) => state.word);
   const solved = useSelector((state) => state.solved);
   const failed = useSelector((state) => state.failed);
   const version = useSelector((state) => state.version);
+  const { guessNumber } = useSelector((state) => state.guessConfig);
   const [guess, setGuess] = useState([]);
 
   useEffect(() => {
@@ -125,25 +126,23 @@ const Guess = ({
           dispatch(setFailed(true));
           markDayPlayed("failed");
         }
-        setGuessNumber((previous) => {
-          if (previous < numberOfGuesses) {
-            return previous + 1;
-          }
-        });
+        if (guessNumber < numberOfGuesses)
+          dispatch(setGuessNumber(guessNumber + 1));
       }
     }, 250);
   };
 
   const markDayPlayed = (outcome) => {
     if (version === "classic") {
-      const wordleInfo = JSON.parse(localStorage.getItem('wordleInfo')) || {
+      const wordleInfo = JSON.parse(localStorage.getItem("wordleInfo")) || {
         streak: 0,
-        lastIndexPlayed: todaysWord.index
+        lastIndexPlayed: todaysWord.index,
       };
       wordleInfo.streak = outcome === "solved" ? wordleInfo.streak + 1 : 0;
       wordleInfo.lastIndexPlayed = todaysWord.index;
       localStorage.setItem("wordleInfo", JSON.stringify(wordleInfo));
-    };
+      wordleInfo.streak > 1 && dispatch(setStreak(wordleInfo.streak));
+    }
   };
 
   return (
@@ -164,7 +163,6 @@ const Guess = ({
               key={num}
               index={index}
               letterNum={i + 1}
-              guessNumber={guessNumber}
               letter={guess[num] || ""}
             />
           );

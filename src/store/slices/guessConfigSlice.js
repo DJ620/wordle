@@ -4,7 +4,8 @@ const guessConfigSlice = createSlice({
     name: "guessConfig",
     initialState: {
         numberOfGuesses: 6,
-        numberOfLetters: 5
+        numberOfLetters: 5,
+        guessNumber: 1
     },
     reducers: {
         setNumberOfGuesses: (state, action) => {
@@ -14,10 +15,14 @@ const guessConfigSlice = createSlice({
         setNumberOfLetters: (state, action) => {
             state.numberOfLetters = action.payload;
             return state;
+        },
+        setGuessNumber: (state, action) => {
+            state.guessNumber = action.payload;
+            return state;
         }
     }
 });
 
-export const { setNumberOfGuesses, setNumberOfLetters } = guessConfigSlice.actions;
+export const { setNumberOfGuesses, setNumberOfLetters, setGuessNumber } = guessConfigSlice.actions;
 
 export default guessConfigSlice.reducer;
